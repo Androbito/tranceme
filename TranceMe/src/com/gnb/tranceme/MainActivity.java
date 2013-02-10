@@ -1,8 +1,11 @@
 package com.gnb.tranceme;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
@@ -20,14 +23,19 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.coboltforge.slidemenu.SlideMenu;
+import com.coboltforge.slidemenu.SlideMenu.SlideMenuItem;
 import com.coboltforge.slidemenu.SlideMenuInterface.OnSlideMenuItemClickListener;
+import com.gnb.WS.WSHelper;
+import com.gnb.WS.WSHelperListener;
 import com.gnb.connexions.Networking;
 import com.gnb.coverflow.CoverFlow;
 import com.gnb.coverflow.ImageAdapter;
 import com.gnb.media.StreamingMediaPlayer;
+import com.gnb.model.Dj;
 import com.gnb.receivers.ConnectionChangeReceiver;
 
-public class MainActivity extends Activity implements OnSlideMenuItemClickListener{
+public class MainActivity extends Activity implements
+		OnSlideMenuItemClickListener, WSHelperListener {
 
 	public Animation upAnimation;
 	public Animation downAnimation;
@@ -40,16 +48,16 @@ public class MainActivity extends Activity implements OnSlideMenuItemClickListen
 	private boolean isPlaying;
 	private boolean encours = false;
 	private StreamingMediaPlayer audioStreamer;
-	private SlideMenu slidemenu;
+	public SlideMenu slidemenu;
+	private ConnectivityManager manager;
+	private List<Dj> listdjs = new ArrayList<Dj>(0);
+	private boolean menuIsVisible = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		slidemenu = (SlideMenu) findViewById(R.id.slideMenu);
-		slidemenu.init(this, R.menu.slide, this, 333);
-		slidemenu.setHeaderImage(getResources().getDrawable(R.drawable.playliste));
 		// hide block notification network
 		networkNotification = (LinearLayout) findViewById(R.id.network_layout);
 		networkcanvas = (FrameLayout) networkNotification
@@ -60,18 +68,23 @@ public class MainActivity extends Activity implements OnSlideMenuItemClickListen
 		receiver = new ConnectionChangeReceiver(MainActivity.this);
 		registerReceiver(receiver, new IntentFilter(
 				ConnectivityManager.CONNECTIVITY_ACTION));
-
+		manager = (ConnectivityManager) this
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		if (Networking.isNetworkAvailable(getApplicationContext())) {
-			System.out.println("ccc network!");
-			init();
+			Log.i("cc", "network!");
+			WSHelper.getInstance().addWSHelperListener(MainActivity.this);
+			WSHelper.getInstance().getDjs(manager, MainActivity.this);
+			viewInit();
 
 		}
 	}
 
-	private void init() {
+	private void viewInit() {
+		slidemenu = (SlideMenu) findViewById(R.id.slideMenu);
+		slidemenu.init(this, R.menu.slide, this, 333);
+		slidemenu.setHeaderImage(getResources().getDrawable(
+				R.drawable.playliste));
 		CoverFlow coverFlow = (CoverFlow) findViewById(R.id.coverFlow1);
-
-		coverFlow.setAdapter(new ImageAdapter(getApplicationContext()));
 
 		ImageAdapter coverImageAdapter = new ImageAdapter(this);
 
@@ -81,19 +94,26 @@ public class MainActivity extends Activity implements OnSlideMenuItemClickListen
 
 		coverFlow.setSpacing(-15);
 		coverFlow.setSelection(1, true);
-		initiation();
+		ctrlInit();
 	}
 
-	private void initiation() {
+	private void ctrlInit() {
 		// TODO Auto-generated method stub
-		((ImageView)findViewById(R.id.playList)).setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				slidemenu.show();
-			}
-		});
+		((ImageView) findViewById(R.id.playList))
+				.setOnClickListener(new View.OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						if (menuIsVisible) {
+							slidemenu.hide();
+							menuIsVisible = false;
+						} else {
+							slidemenu.show();
+							menuIsVisible = true;
+						}
+					}
+				});
 		streamButton = (ImageButton) findViewById(R.id.imageButton1);
 		streamButton.setOnClickListener(new View.OnClickListener() {
 
@@ -260,7 +280,32 @@ public class MainActivity extends Activity implements OnSlideMenuItemClickListen
 	@Override
 	public void onSlideMenuItemClick(int itemId) {
 		// TODO Auto-generated method stub
-		
+		Toast.makeText(this, ""+itemId, Toast.LENGTH_SHORT)
+				.show();
+		menuIsVisible = false;
+	}
+
+	@Override
+	public void onDjsLoaded(List<Dj> djs) {
+		// TODO Auto-generated method stub
+		listdjs.addAll(djs);
+		for (Dj dj : djs) {
+			SlideMenuItem item = new SlideMenuItem();
+			item.id = dj.getId();
+			item.icon = getResources().getDrawable(R.drawable.music);
+			item.label = dj.getName();
+			slidemenu.addMenuItem(item);
+			slidemenu.addMenuItem(item);
+			slidemenu.addMenuItem(item);
+			slidemenu.addMenuItem(item);
+		}
+
+	}
+
+	@Override
+	public void onErrorLoadingDj() {
+		// TODO Auto-generated method stub
+		Log.i("MainActivity", "onErrorLoadingDj");
 	}
 
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TranceMe</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="item_nearby">Discovery</string>
+    <string name="item_meetme">Adele</string>
+    <string name="item_profile">Roche voisine</string>
+     <string name="network">No internet connection </string>
+</resources>

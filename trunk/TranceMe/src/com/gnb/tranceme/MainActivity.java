@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.coboltforge.slidemenu.SlideMenu;
 import com.coboltforge.slidemenu.SlideMenu.SlideMenuItem;
 import com.coboltforge.slidemenu.SlideMenuInterface.OnSlideMenuItemClickListener;
+import com.gnb.tranceme.R;
 import com.gnb.WS.WSHelper;
 import com.gnb.WS.WSHelperListener;
 import com.gnb.connexions.Networking;

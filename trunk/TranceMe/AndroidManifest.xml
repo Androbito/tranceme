@@ -21,7 +21,9 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.gnb.tranceme.MainActivity"
-            android:label="@string/app_name" >
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -25,7 +25,6 @@ import android.widget.Toast;
 import com.coboltforge.slidemenu.SlideMenu;
 import com.coboltforge.slidemenu.SlideMenu.SlideMenuItem;
 import com.coboltforge.slidemenu.SlideMenuInterface.OnSlideMenuItemClickListener;
-import com.gnb.tranceme.R;
 import com.gnb.WS.WSHelper;
 import com.gnb.WS.WSHelperListener;
 import com.gnb.connexions.Networking;
@@ -33,6 +32,7 @@ import com.gnb.coverflow.CoverFlow;
 import com.gnb.coverflow.ImageAdapter;
 import com.gnb.media.StreamingMediaPlayer;
 import com.gnb.model.Dj;
+import com.gnb.model.Hit;
 import com.gnb.receivers.ConnectionChangeReceiver;
 
 public class MainActivity extends Activity implements
@@ -127,38 +127,38 @@ public class MainActivity extends Activity implements
 		});
 	}
 
-	private void initControls() {
-		streamButton = (ImageButton) findViewById(R.id.imageButton1);
-		streamButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				if (!encours)
-					startStreamingAudio();
-				else {
-					if (!isPlaying
-							&& !audioStreamer.getMediaPlayer().isPlaying()) {
-
-						audioStreamer.getMediaPlayer().start();
-						audioStreamer.startPlayProgressUpdater();
-					}
-					Toast t = new Toast(MainActivity.this);
-					t.setText("error !!!");
-					t.show();
-					isPlaying = !isPlaying;
-				}
-			}
-		});
-
-		playButton = (ImageButton) findViewById(R.id.imageButton2);
-		playButton.setEnabled(false);
-		playButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				if (audioStreamer.getMediaPlayer().isPlaying()) {
-					audioStreamer.getMediaPlayer().pause();
-				}
-				isPlaying = !isPlaying;
-			}
-		});
-	}
+//	private void initControls() {
+//		streamButton = (ImageButton) findViewById(R.id.imageButton1);
+//		streamButton.setOnClickListener(new View.OnClickListener() {
+//			public void onClick(View view) {
+//				if (!encours)
+//					startStreamingAudio();
+//				else {
+//					if (!isPlaying
+//							&& !audioStreamer.getMediaPlayer().isPlaying()) {
+//
+//						audioStreamer.getMediaPlayer().start();
+//						audioStreamer.startPlayProgressUpdater();
+//					}
+//					Toast t = new Toast(MainActivity.this);
+//					t.setText("error !!!");
+//					t.show();
+//					isPlaying = !isPlaying;
+//				}
+//			}
+//		});
+//
+//		playButton = (ImageButton) findViewById(R.id.imageButton2);
+//		playButton.setEnabled(false);
+//		playButton.setOnClickListener(new View.OnClickListener() {
+//			public void onClick(View view) {
+//				if (audioStreamer.getMediaPlayer().isPlaying()) {
+//					audioStreamer.getMediaPlayer().pause();
+//				}
+//				isPlaying = !isPlaying;
+//			}
+//		});
+//	}
 
 	private void startStreamingAudio() {
 		try {
@@ -281,8 +281,8 @@ public class MainActivity extends Activity implements
 	@Override
 	public void onSlideMenuItemClick(int itemId) {
 		// TODO Auto-generated method stub
-		Toast.makeText(this, ""+itemId, Toast.LENGTH_SHORT)
-				.show();
+		Toast.makeText(this, "" + itemId, Toast.LENGTH_SHORT).show();
+		WSHelper.getInstance().gethitsById(itemId,manager, MainActivity.this);
 		menuIsVisible = false;
 	}
 
@@ -296,10 +296,10 @@ public class MainActivity extends Activity implements
 			item.icon = getResources().getDrawable(R.drawable.music);
 			item.label = dj.getName();
 			slidemenu.addMenuItem(item);
-			slidemenu.addMenuItem(item);
-			slidemenu.addMenuItem(item);
-			slidemenu.addMenuItem(item);
 		}
+		((ImageView) findViewById(R.id.playList)).setClickable(true);
+		((ProgressBar) findViewById(R.id.progressLoding))
+				.setVisibility(View.GONE);
 
 	}
 
@@ -307,6 +307,18 @@ public class MainActivity extends Activity implements
 	public void onErrorLoadingDj() {
 		// TODO Auto-generated method stub
 		Log.i("MainActivity", "onErrorLoadingDj");
+	}
+
+	@Override
+	public void onHitsLoaded(List<Hit> hits) {
+		// TODO Auto-generated method stub
+		Log.i("onHitsLoaded",""+hits.size());
+	}
+
+	@Override
+	public void onErrorLoadingHit() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

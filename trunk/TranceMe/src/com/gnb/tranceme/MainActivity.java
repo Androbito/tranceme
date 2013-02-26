@@ -297,9 +297,11 @@ public class MainActivity extends Activity implements
 			item.label = dj.getName();
 			slidemenu.addMenuItem(item);
 		}
-		((ImageView) findViewById(R.id.playList)).setClickable(true);
+		
 		((ProgressBar) findViewById(R.id.progressLoding))
 				.setVisibility(View.GONE);
+		((ImageView) findViewById(R.id.playList)).setVisibility(View.VISIBLE);
+		((ImageView) findViewById(R.id.playList)).setClickable(true);
 
 	}
 

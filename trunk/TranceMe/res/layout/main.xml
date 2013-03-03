@@ -102,8 +102,7 @@
                             android:id="@+id/imageButton5"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
-                            android:background="@drawable/forward"
-                            android:onClick="change" />
+                            android:background="@drawable/forward" />
 
                         <ImageButton
                             android:id="@+id/imageButton1"
@@ -115,8 +114,7 @@
                             android:id="@+id/imageButton4"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
-                            android:background="@drawable/backward"
-                            android:onClick="change" />
+                            android:background="@drawable/backward" />
                     </LinearLayout>
 
                     <ImageButton

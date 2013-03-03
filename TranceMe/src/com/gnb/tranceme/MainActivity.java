@@ -85,16 +85,7 @@ public class MainActivity extends Activity implements
 		slidemenu.init(this, R.menu.slide, this, 333);
 		slidemenu.setHeaderImage(getResources().getDrawable(
 				R.drawable.playliste));
-		CoverFlow coverFlow = (CoverFlow) findViewById(R.id.coverFlow1);
 
-		ImageAdapter coverImageAdapter = new ImageAdapter(this);
-
-		coverImageAdapter.createReflectedImages();
-
-		coverFlow.setAdapter(coverImageAdapter);
-
-		coverFlow.setSpacing(-15);
-		coverFlow.setSelection(1, true);
 		ctrlInit();
 	}
 
@@ -127,38 +118,38 @@ public class MainActivity extends Activity implements
 		});
 	}
 
-//	private void initControls() {
-//		streamButton = (ImageButton) findViewById(R.id.imageButton1);
-//		streamButton.setOnClickListener(new View.OnClickListener() {
-//			public void onClick(View view) {
-//				if (!encours)
-//					startStreamingAudio();
-//				else {
-//					if (!isPlaying
-//							&& !audioStreamer.getMediaPlayer().isPlaying()) {
-//
-//						audioStreamer.getMediaPlayer().start();
-//						audioStreamer.startPlayProgressUpdater();
-//					}
-//					Toast t = new Toast(MainActivity.this);
-//					t.setText("error !!!");
-//					t.show();
-//					isPlaying = !isPlaying;
-//				}
-//			}
-//		});
-//
-//		playButton = (ImageButton) findViewById(R.id.imageButton2);
-//		playButton.setEnabled(false);
-//		playButton.setOnClickListener(new View.OnClickListener() {
-//			public void onClick(View view) {
-//				if (audioStreamer.getMediaPlayer().isPlaying()) {
-//					audioStreamer.getMediaPlayer().pause();
-//				}
-//				isPlaying = !isPlaying;
-//			}
-//		});
-//	}
+	// private void initControls() {
+	// streamButton = (ImageButton) findViewById(R.id.imageButton1);
+	// streamButton.setOnClickListener(new View.OnClickListener() {
+	// public void onClick(View view) {
+	// if (!encours)
+	// startStreamingAudio();
+	// else {
+	// if (!isPlaying
+	// && !audioStreamer.getMediaPlayer().isPlaying()) {
+	//
+	// audioStreamer.getMediaPlayer().start();
+	// audioStreamer.startPlayProgressUpdater();
+	// }
+	// Toast t = new Toast(MainActivity.this);
+	// t.setText("error !!!");
+	// t.show();
+	// isPlaying = !isPlaying;
+	// }
+	// }
+	// });
+	//
+	// playButton = (ImageButton) findViewById(R.id.imageButton2);
+	// playButton.setEnabled(false);
+	// playButton.setOnClickListener(new View.OnClickListener() {
+	// public void onClick(View view) {
+	// if (audioStreamer.getMediaPlayer().isPlaying()) {
+	// audioStreamer.getMediaPlayer().pause();
+	// }
+	// isPlaying = !isPlaying;
+	// }
+	// });
+	// }
 
 	private void startStreamingAudio() {
 		try {
@@ -282,7 +273,7 @@ public class MainActivity extends Activity implements
 	public void onSlideMenuItemClick(int itemId) {
 		// TODO Auto-generated method stub
 		Toast.makeText(this, "" + itemId, Toast.LENGTH_SHORT).show();
-		WSHelper.getInstance().gethitsById(itemId,manager, MainActivity.this);
+		WSHelper.getInstance().gethitsById(itemId, manager, MainActivity.this);
 		menuIsVisible = false;
 	}
 
@@ -297,7 +288,7 @@ public class MainActivity extends Activity implements
 			item.label = dj.getName();
 			slidemenu.addMenuItem(item);
 		}
-		
+
 		((ProgressBar) findViewById(R.id.progressLoding))
 				.setVisibility(View.GONE);
 		((ImageView) findViewById(R.id.playList)).setVisibility(View.VISIBLE);
@@ -314,13 +305,31 @@ public class MainActivity extends Activity implements
 	@Override
 	public void onHitsLoaded(List<Hit> hits) {
 		// TODO Auto-generated method stub
-		Log.i("onHitsLoaded",""+hits.size());
+		
+		ImageView[] imgView = new ImageView[hits.size()];
+		for (Hit hit : hits) {
+			ImageView i = new ImageView(this);
+			i.setImageResource(R.drawable.starssailor_silence_is_easy);
+			i.setLayoutParams(new CoverFlow.LayoutParams(130, 130));
+			i.setScaleType(ImageView.ScaleType.MATRIX);
+			imgView[hits.indexOf(hit)] = i;
+		}
+		CoverFlow coverFlow = (CoverFlow) findViewById(R.id.coverFlow1);
+
+		ImageAdapter coverImageAdapter = new ImageAdapter(this,imgView);
+
+//		coverImageAdapter.createReflectedImages();
+
+		coverFlow.setAdapter(coverImageAdapter);
+
+		coverFlow.setSpacing(-15);
+		coverFlow.setSelection(0, true);
 	}
 
 	@Override
 	public void onErrorLoadingHit() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

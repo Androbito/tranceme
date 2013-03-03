@@ -19,10 +19,10 @@ import android.util.Log;
 
 public class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
 	private String url;
-	private List<Bitmap> mlistBit;
+	private Bitmap mBit;
 
-	public BitmapDownloaderTask(List<Bitmap> listBit) {
-		mlistBit = listBit;
+	public BitmapDownloaderTask(Bitmap bitmap) {
+		mBit = bitmap;
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class BitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
 		}
 
 		if (bitmap != null) {
-			mlistBit.add(bitmap);
+			mBit = bitmap;
 		}
 	}
 }

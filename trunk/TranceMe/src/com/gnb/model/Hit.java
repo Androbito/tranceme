@@ -28,4 +28,46 @@ public class Hit {
 		this.info = info;
 		this.img = img;
 	}
+	public int getIdAut() {
+		return idAut;
+	}
+	public void setIdAut(int idAut) {
+		this.idAut = idAut;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getDuration() {
+		return duration;
+	}
+	public void setDuration(String duration) {
+		this.duration = duration;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public String getInfo() {
+		return info;
+	}
+	public void setInfo(String info) {
+		this.info = info;
+	}
+	public String getImg() {
+		return img;
+	}
+	public void setImg(String img) {
+		this.img = img;
+	}
 }

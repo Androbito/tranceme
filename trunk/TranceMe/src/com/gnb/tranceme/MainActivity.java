@@ -1,16 +1,27 @@
 package com.gnb.tranceme;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
@@ -53,7 +64,8 @@ public class MainActivity extends Activity implements
 	private ConnectivityManager manager;
 	private List<Dj> listdjs = new ArrayList<Dj>(0);
 	private boolean menuIsVisible = false;
-
+	private List<Hit> hits;
+	private AlertDialog alert;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
@@ -85,7 +97,9 @@ public class MainActivity extends Activity implements
 		slidemenu.init(this, R.menu.slide, this, 333);
 		slidemenu.setHeaderImage(getResources().getDrawable(
 				R.drawable.playliste));
-
+		alert = new AlertDialog.Builder(this).create();
+		alert.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		alert.setMessage("loading tracks ...!");
 		ctrlInit();
 	}
 
@@ -272,7 +286,8 @@ public class MainActivity extends Activity implements
 	@Override
 	public void onSlideMenuItemClick(int itemId) {
 		// TODO Auto-generated method stub
-		Toast.makeText(this, "" + itemId, Toast.LENGTH_SHORT).show();
+//		Toast.makeText(this, "" + itemId, Toast.LENGTH_SHORT).show();
+		alert.show();
 		WSHelper.getInstance().gethitsById(itemId, manager, MainActivity.this);
 		menuIsVisible = false;
 	}
@@ -305,25 +320,48 @@ public class MainActivity extends Activity implements
 	@Override
 	public void onHitsLoaded(List<Hit> hits) {
 		// TODO Auto-generated method stub
-		
+		this.hits = new ArrayList<Hit>(hits.size());
+		this.hits.addAll(hits);
 		ImageView[] imgView = new ImageView[hits.size()];
-		for (Hit hit : hits) {
-			ImageView i = new ImageView(this);
-			i.setImageResource(R.drawable.starssailor_silence_is_easy);
-			i.setLayoutParams(new CoverFlow.LayoutParams(130, 130));
-			i.setScaleType(ImageView.ScaleType.MATRIX);
-			imgView[hits.indexOf(hit)] = i;
+		for (int i = 0; i < hits.size(); i++) {
+			ImageView iv = new ImageView(this);
+			Hit hit = hits.get(i);
+			if(hit.getImg().length()==0)
+				hit.setImg("http://www.djluv.in/music/images/albums/1330236629_its-cover-not-found.jpg");
+			Log.i("img", "" + hit.img);
+			try {
+				URL url = new URL(hit.img);
+				URI uri = new URI(url.getProtocol(), url.getHost(), url.getPath(), url.getQuery(), null);
+				iv.setImageDrawable(Drawable.createFromStream(
+						(InputStream) new URL(uri.toString()).getContent(),
+						""));
+			} catch (MalformedURLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			iv.setLayoutParams(new CoverFlow.LayoutParams(130, 130));
+			iv.setScaleType(ImageView.ScaleType.MATRIX);
+			imgView[hits.indexOf(hit)] = iv;
+			
 		}
-		CoverFlow coverFlow = (CoverFlow) findViewById(R.id.coverFlow1);
-
-		ImageAdapter coverImageAdapter = new ImageAdapter(this,imgView);
-
-//		coverImageAdapter.createReflectedImages();
-
-		coverFlow.setAdapter(coverImageAdapter);
-
-		coverFlow.setSpacing(-15);
-		coverFlow.setSelection(0, true);
+		Log.i("imgView", "" + imgView.length);
+		 CoverFlow coverFlow = (CoverFlow) findViewById(R.id.coverFlow1);
+		
+		 ImageAdapter coverImageAdapter = new ImageAdapter(this,imgView);
+		
+//		 coverImageAdapter.createReflectedImages();
+		
+		 coverFlow.setAdapter(coverImageAdapter);
+		
+		 coverFlow.setSpacing(-15);
+		 coverFlow.setSelection(0, true);
+		 alert.dismiss();
 	}
 
 	@Override
@@ -331,5 +369,18 @@ public class MainActivity extends Activity implements
 		// TODO Auto-generated method stub
 
 	}
-
+//	public static Bitmap getBitmapFromURL(String src) {
+//	    try {
+//	        URL url = new URL(src);
+//	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//	        connection.setDoInput(true);
+//	        connection.connect();
+//	        InputStream input = connection.getInputStream();
+//	        Bitmap myBitmap = BitmapFactory.decodeStream(input);
+//	        return myBitmap;
+//	    } catch (IOException e) {
+//	        e.printStackTrace();
+//	        return null;
+//	    }
+//	}
 }

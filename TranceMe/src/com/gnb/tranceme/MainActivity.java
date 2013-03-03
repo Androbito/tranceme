@@ -117,7 +117,6 @@ public class MainActivity extends Activity implements
 		alert.setMessage("loading tracks ...!");
 		coverFlow = (CoverFlow) findViewById(R.id.coverFlow1);
 		slideInit();
-		initControls();
 	}
 
 	private void slideInit() {
@@ -358,6 +357,7 @@ public class MainActivity extends Activity implements
 
 	@Override
 	public void onHitsLoaded(List<Hit> hits) {
+		initControls();
 		// TODO Auto-generated method stub
 		this.hits = new ArrayList<Hit>(hits.size());
 		this.hits.addAll(hits);

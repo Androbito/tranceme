@@ -2,7 +2,6 @@ package com.gnb.tranceme;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,20 +14,22 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Bitmap.Config;
 import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader.TileMode;
-import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -39,8 +40,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ImageView.ScaleType;
 
 import com.coboltforge.slidemenu.SlideMenu;
 import com.coboltforge.slidemenu.SlideMenu.SlideMenuItem;
@@ -48,6 +49,8 @@ import com.coboltforge.slidemenu.SlideMenuInterface.OnSlideMenuItemClickListener
 import com.gnb.WS.WSHelper;
 import com.gnb.WS.WSHelperListener;
 import com.gnb.connexions.Networking;
+import com.gnb.coverflow.CoverAdapterView;
+import com.gnb.coverflow.CoverAdapterView.OnItemSelectedListener;
 import com.gnb.coverflow.CoverFlow;
 import com.gnb.coverflow.ImageAdapter;
 import com.gnb.media.StreamingMediaPlayer;
@@ -64,8 +67,7 @@ public class MainActivity extends Activity implements
 	public FrameLayout networkcanvas;
 	ConnectionChangeReceiver receiver;
 
-	private ImageButton streamButton;
-	private ImageButton playButton;
+	private ImageButton playButton, pauseButton, stopButton;
 	private boolean isPlaying;
 	private boolean encours = false;
 	private StreamingMediaPlayer audioStreamer;
@@ -75,6 +77,9 @@ public class MainActivity extends Activity implements
 	private boolean menuIsVisible = false;
 	private List<Hit> hits;
 	private AlertDialog alert;
+	private CoverFlow coverFlow;
+	private Hit hit;
+	private MediaPlayer mediaPlayer = new MediaPlayer();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -110,10 +115,12 @@ public class MainActivity extends Activity implements
 		alert = new AlertDialog.Builder(this).create();
 		alert.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		alert.setMessage("loading tracks ...!");
-		ctrlInit();
+		coverFlow = (CoverFlow) findViewById(R.id.coverFlow1);
+		slideInit();
+		initControls();
 	}
 
-	private void ctrlInit() {
+	private void slideInit() {
 		// TODO Auto-generated method stub
 		((ImageView) findViewById(R.id.playList))
 				.setOnClickListener(new View.OnClickListener() {
@@ -130,69 +137,87 @@ public class MainActivity extends Activity implements
 						}
 					}
 				});
-		streamButton = (ImageButton) findViewById(R.id.imageButton1);
-		streamButton.setOnClickListener(new View.OnClickListener() {
+	}
+
+	private void initControls() {
+		playButton = (ImageButton) findViewById(R.id.imageButton1);
+		playButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View view) {
+				try {
+					if (mediaPlayer.isPlaying()) {
+						mediaPlayer.stop();
+						mediaPlayer.reset();
+					}
+					play(new URL(MainActivity.this.hit.url));
+					mediaPlayer.start();
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+
+		pauseButton = (ImageButton) findViewById(R.id.imageButton2);
+		pauseButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View view) {
+				if (mediaPlayer.isPlaying()) {
+					mediaPlayer.pause();
+				}
+			}
+		});
+		stopButton = (ImageButton) findViewById(R.id.imageButton3);
+		stopButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Toast.makeText(MainActivity.this, "Play", Toast.LENGTH_SHORT)
-						.show();
+				if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+					mediaPlayer.stop();
+					mediaPlayer.reset();
+				}
+
 			}
 		});
 	}
 
-	// private void initControls() {
-	// streamButton = (ImageButton) findViewById(R.id.imageButton1);
-	// streamButton.setOnClickListener(new View.OnClickListener() {
-	// public void onClick(View view) {
-	// if (!encours)
-	// startStreamingAudio();
-	// else {
-	// if (!isPlaying
-	// && !audioStreamer.getMediaPlayer().isPlaying()) {
-	//
-	// audioStreamer.getMediaPlayer().start();
-	// audioStreamer.startPlayProgressUpdater();
-	// }
-	// Toast t = new Toast(MainActivity.this);
-	// t.setText("error !!!");
-	// t.show();
-	// isPlaying = !isPlaying;
-	// }
-	// }
-	// });
-	//
-	// playButton = (ImageButton) findViewById(R.id.imageButton2);
-	// playButton.setEnabled(false);
-	// playButton.setOnClickListener(new View.OnClickListener() {
-	// public void onClick(View view) {
-	// if (audioStreamer.getMediaPlayer().isPlaying()) {
-	// audioStreamer.getMediaPlayer().pause();
-	// }
-	// isPlaying = !isPlaying;
-	// }
-	// });
-	// }
-
-	private void startStreamingAudio() {
+	protected void play(URL url) {
+		// TODO Auto-generated method stub
 		try {
-			final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar1);
-			if (audioStreamer != null) {
-				audioStreamer.interrupt();
-			}
-			audioStreamer = new StreamingMediaPlayer(this, null, playButton,
-					streamButton, progressBar);
-			audioStreamer.startStreaming(
-					"http://a.tumblr.com/tumblr_lvqijtNrYm1r2apjao1.mp3",
-					200000, 8000);
-			streamButton.setEnabled(false);
-			encours = true;
+			mediaPlayer.setDataSource(url.toString());
+			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			mediaPlayer.prepare();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (IOException e) {
-			Log.e(getClass().getName(), "Error starting to stream audio.", e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}
+
+	// private void startStreamingAudio(String url) {
+	// try {
+	// final ProgressBar progressBar = (ProgressBar)
+	// findViewById(R.id.progressBar1);
+	// if (audioStreamer != null) {
+	// audioStreamer.interrupt();
+	// }
+	// audioStreamer = new StreamingMediaPlayer(this, null, playButton,
+	// streamButton, progressBar);
+	// audioStreamer.startStreaming(url, 200000, 8000);
+	// encours = true;
+	// } catch (IOException e) {
+	// Log.e(getClass().getName(), "Error starting to stream audio.", e);
+	// }
+	//
+	// }
 
 	public void connectionListener(Object object) {
 
@@ -313,7 +338,11 @@ public class MainActivity extends Activity implements
 			item.label = dj.getName();
 			slidemenu.addMenuItem(item);
 		}
-
+		SlideMenuItem item = new SlideMenuItem();
+		item.id = -1;
+		item.icon = getResources().getDrawable(R.drawable.music);
+		item.label = "Favoris";
+		slidemenu.addMenuItem(item);
 		((ProgressBar) findViewById(R.id.progressLoding))
 				.setVisibility(View.GONE);
 		((ImageView) findViewById(R.id.playList)).setVisibility(View.VISIBLE);
@@ -361,26 +390,49 @@ public class MainActivity extends Activity implements
 
 		}
 		Log.i("imgView", "" + imgView.length);
-		CoverFlow coverFlow = (CoverFlow) findViewById(R.id.coverFlow1);
-
 		ImageAdapter coverImageAdapter = new ImageAdapter(this, imgView);
-
-		// coverImageAdapter.createReflectedImages();
 
 		coverFlow.setAdapter(coverImageAdapter);
 
 		coverFlow.setSpacing(-15);
 		coverFlow.setSelection(0, true);
+		((TextView) findViewById(R.id.hititle)).setText(MainActivity.this.hits
+				.get(0).title);
+
+		MainActivity.this.hit = MainActivity.this.hits.get(0);
+		try {
+			play(new URL(MainActivity.this.hit.url));
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		coverFlow.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(CoverAdapterView<?> parent, View view,
+					int position, long id) {
+				// TODO Auto-generated method stub
+				((TextView) findViewById(R.id.hititle))
+						.setText(MainActivity.this.hits.get(position).title);
+				MainActivity.this.hit = MainActivity.this.hits.get(position);
+			}
+
+			@Override
+			public void onNothingSelected(CoverAdapterView<?> parent) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 		alert.dismiss();
 	}
 
 	@Override
 	public void onErrorLoadingHit() {
 		// TODO Auto-generated method stub
-
+		Log.i("MainActivity", "onErrorLoadingHit");
 	}
 
-	public static Bitmap getBitmapFromInputStream(InputStream input) {
+	public Bitmap getBitmapFromInputStream(InputStream input) {
 		Bitmap myBitmap = BitmapFactory.decodeStream(input);
 		return myBitmap;
 	}

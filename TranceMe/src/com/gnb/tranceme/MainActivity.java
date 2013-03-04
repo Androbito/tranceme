@@ -354,14 +354,16 @@ public class MainActivity extends Activity implements
 					favHits = new ArrayList<Hit>(0);
 					favHits.addAll(db.getFavHits());
 					Log.i("t", "" + favHits.size());
-					if(favHits.size()==0)
+					if (favHits.size() == 0)
 						runOnUiThread(new Runnable() {
-							
+
 							@Override
 							public void run() {
 								// TODO Auto-generated method stub
 								alert.dismiss();
-								Toast.makeText(getApplicationContext(), "No saved Favorites ", Toast.LENGTH_LONG).show();
+								Toast.makeText(getApplicationContext(),
+										"No saved Favorites ",
+										Toast.LENGTH_LONG).show();
 							}
 						});
 					else
@@ -406,44 +408,45 @@ public class MainActivity extends Activity implements
 
 	@Override
 	public void onHitsLoaded(final List<Hit> hits) {
+
+		// TODO Auto-generated method stub
+
+		initControls();
+		// TODO Auto-generated method stub
+		MainActivity.this.hits = new ArrayList<Hit>(hits.size());
+		MainActivity.this.hits.addAll(hits);
+		final ImageView[] imgView = new ImageView[hits.size()];
+		for (int i = 0; i < hits.size(); i++) {
+			ImageView iv = new ImageView(MainActivity.this);
+			Hit hit = hits.get(i);
+			if (hit.getImg().length() == 0)
+				hit.setImg("http://www.djluv.in/music/images/albums/1330236629_its-cover-not-found.jpg");
+			Log.i("img", "" + hit.img);
+			try {
+				URL url = new URL(hit.img);
+				URI uri = new URI(url.getProtocol(), url.getHost(),
+						url.getPath(), url.getQuery(), null);
+				iv.setImageBitmap(createReflectedImages(getBitmapFromInputStream((InputStream) new URL(
+						uri.toString()).getContent())));
+			} catch (MalformedURLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			iv.setLayoutParams(new CoverFlow.LayoutParams(120, 180));
+			iv.setScaleType(ImageView.ScaleType.MATRIX);
+			imgView[hits.indexOf(hit)] = iv;
+
+		}
 		runOnUiThread(new Runnable() {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
-
-				initControls();
-				// TODO Auto-generated method stub
-				MainActivity.this.hits = new ArrayList<Hit>(hits.size());
-				MainActivity.this.hits.addAll(hits);
-				ImageView[] imgView = new ImageView[hits.size()];
-				for (int i = 0; i < hits.size(); i++) {
-					ImageView iv = new ImageView(MainActivity.this);
-					Hit hit = hits.get(i);
-					if (hit.getImg().length() == 0)
-						hit.setImg("http://www.djluv.in/music/images/albums/1330236629_its-cover-not-found.jpg");
-					Log.i("img", "" + hit.img);
-					try {
-						URL url = new URL(hit.img);
-						URI uri = new URI(url.getProtocol(), url.getHost(),
-								url.getPath(), url.getQuery(), null);
-						iv.setImageBitmap(createReflectedImages(getBitmapFromInputStream((InputStream) new URL(
-								uri.toString()).getContent())));
-					} catch (MalformedURLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (URISyntaxException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					iv.setLayoutParams(new CoverFlow.LayoutParams(120, 180));
-					iv.setScaleType(ImageView.ScaleType.MATRIX);
-					imgView[hits.indexOf(hit)] = iv;
-
-				}
 				Log.i("imgView", "" + imgView.length);
 				ImageAdapter coverImageAdapter = new ImageAdapter(
 						MainActivity.this, imgView);

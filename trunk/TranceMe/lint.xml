@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
-    <issue id="NewApi">
-        <ignore path="src\com\gnb\tranceme\MainActivity.java" />
-        <ignore path="src\com\gnb\utils\BitmapDownloaderTask.java" />
-    </issue>
+    <issue id="NewApi" severity="ignore" />
 </lint>

@@ -57,6 +57,7 @@ import com.gnb.media.StreamingMediaPlayer;
 import com.gnb.model.Dj;
 import com.gnb.model.Hit;
 import com.gnb.receivers.ConnectionChangeReceiver;
+import com.gnb.sqlite.DatabaseHandler;
 
 public class MainActivity extends Activity implements
 		OnSlideMenuItemClickListener, WSHelperListener {
@@ -68,6 +69,7 @@ public class MainActivity extends Activity implements
 	ConnectionChangeReceiver receiver;
 
 	private ImageButton playButton, pauseButton, stopButton;
+	ImageView favorisButton;
 	private boolean isPlaying;
 	private boolean encours = false;
 	private StreamingMediaPlayer audioStreamer;
@@ -175,6 +177,19 @@ public class MainActivity extends Activity implements
 					mediaPlayer.reset();
 				}
 
+			}
+		});
+		final DatabaseHandler db = new DatabaseHandler(getApplicationContext());
+		favorisButton = (ImageView) findViewById(R.id.favoris);
+		favorisButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				db.addHitToFavoris(MainActivity.this.hit);
+				Toast.makeText(MainActivity.this, "add to fav"+db.getFavHits().size(), Toast.LENGTH_SHORT)
+				.show();
+				
 			}
 		});
 	}

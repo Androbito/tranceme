@@ -57,7 +57,7 @@ public class WSHelper {
 				WebThread.ENCODING_UTF_8, false);
 		wt.setListener(new WebListener() {
 			public void onFinish(String url, String resultat) {
-				Log.i("WSHelper",resultat);
+				Log.i("WSHelper", resultat);
 				onFinishGethits(resultat, context);
 			}
 
@@ -83,13 +83,9 @@ public class WSHelper {
 				return;
 			}
 
-			context.runOnUiThread(new Runnable() {
-				public void run() {
-					for (WSHelperListener listener : wsHelperListeners) {
-						listener.onHitsLoaded(parser.getObjects());
-					}
-				}
-			});
+			for (WSHelperListener listener : wsHelperListeners) {
+				listener.onHitsLoaded(parser.getObjects());
+			}
 			Log.i("WSHelper", "onFinishGethits");
 		} catch (Exception e) {
 			onErrorGetHits(context);

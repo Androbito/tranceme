@@ -1,7 +1,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@android:color/transparent"
+    android:background="@drawable/back"
     android:orientation="vertical" >
 
     <com.coboltforge.slidemenu.SlideMenu
@@ -10,11 +11,8 @@
         android:layout_height="match_parent" />
 
     <LinearLayout
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="@drawable/back"
         android:orientation="vertical"
         tools:context=".MainActivity" >
 

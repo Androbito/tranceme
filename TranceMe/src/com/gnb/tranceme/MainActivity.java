@@ -85,6 +85,14 @@ public class MainActivity extends Activity implements
 	private MediaPlayer mediaPlayer = new MediaPlayer();
 	DatabaseHandler db;
 
+	public Hit getHit() {
+		return hit;
+	}
+
+	public void setHit(Hit hit) {
+		this.hit = hit;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
@@ -152,7 +160,8 @@ public class MainActivity extends Activity implements
 						mediaPlayer.stop();
 						mediaPlayer.reset();
 					}
-					play(new URL(MainActivity.this.hit.url));
+					Log.i("ok",MainActivity.this.getHit().url);
+					play(new URL(MainActivity.this.getHit().url));
 					mediaPlayer.start();
 				} catch (MalformedURLException e) {
 					// TODO Auto-generated catch block
@@ -218,23 +227,6 @@ public class MainActivity extends Activity implements
 		}
 
 	}
-
-	// private void startStreamingAudio(String url) {
-	// try {
-	// final ProgressBar progressBar = (ProgressBar)
-	// findViewById(R.id.progressBar1);
-	// if (audioStreamer != null) {
-	// audioStreamer.interrupt();
-	// }
-	// audioStreamer = new StreamingMediaPlayer(this, null, playButton,
-	// streamButton, progressBar);
-	// audioStreamer.startStreaming(url, 200000, 8000);
-	// encours = true;
-	// } catch (IOException e) {
-	// Log.e(getClass().getName(), "Error starting to stream audio.", e);
-	// }
-	//
-	// }
 
 	public void connectionListener(Object object) {
 
@@ -411,7 +403,6 @@ public class MainActivity extends Activity implements
 
 		// TODO Auto-generated method stub
 
-		initControls();
 		// TODO Auto-generated method stub
 		MainActivity.this.hits = new ArrayList<Hit>(hits.size());
 		MainActivity.this.hits.addAll(hits);
@@ -458,13 +449,7 @@ public class MainActivity extends Activity implements
 				((TextView) findViewById(R.id.hititle))
 						.setText(MainActivity.this.hits.get(0).title);
 
-				MainActivity.this.hit = MainActivity.this.hits.get(0);
-				try {
-					play(new URL(MainActivity.this.hit.url));
-				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				MainActivity.this.setHit(MainActivity.this.hits.get(0));
 				coverFlow
 						.setOnItemSelectedListener(new OnItemSelectedListener() {
 
@@ -473,20 +458,19 @@ public class MainActivity extends Activity implements
 									CoverAdapterView<?> parent, View view,
 									int position, long id) {
 								// TODO Auto-generated method stub
+								MainActivity.this.setHit(MainActivity.this.hits
+										.get(position));
 								((TextView) findViewById(R.id.hititle))
-										.setText(MainActivity.this.hits
-												.get(position).title);
-								MainActivity.this.hit = MainActivity.this.hits
-										.get(position);
+										.setText(MainActivity.this.getHit().title);
 							}
 
 							@Override
 							public void onNothingSelected(
 									CoverAdapterView<?> parent) {
 								// TODO Auto-generated method stub
-
 							}
 						});
+				initControls();
 				alert.dismiss();
 			}
 		});

@@ -9,8 +9,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.R.bool;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -28,6 +30,7 @@ import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -36,6 +39,7 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -68,9 +72,8 @@ public class MainActivity extends Activity implements
 	public LinearLayout networkNotification;
 	public FrameLayout networkcanvas;
 	ConnectionChangeReceiver receiver;
-	private Handler mHandler = new Handler();
 	private ImageButton playButton, pauseButton, stopButton;
-	ImageView favorisButton;
+	ImageView favorisButton, shareButton;
 	private boolean isPlaying;
 	private boolean encours = false;
 	private StreamingMediaPlayer audioStreamer;
@@ -82,8 +85,10 @@ public class MainActivity extends Activity implements
 	private AlertDialog alert;
 	private CoverFlow coverFlow;
 	private Hit hit;
+	private boolean shareLayVisib = false;
 	private MediaPlayer mediaPlayer = new MediaPlayer();
 	DatabaseHandler db;
+	protected ProgressDialog mProgressDialog;
 
 	public Hit getHit() {
 		return hit;
@@ -127,7 +132,7 @@ public class MainActivity extends Activity implements
 				R.drawable.playliste));
 		alert = new AlertDialog.Builder(this).create();
 		alert.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		alert.setMessage("loading tracks ...!");
+		alert.setMessage("Loading playlist ...!");
 		coverFlow = (CoverFlow) findViewById(R.id.coverFlow1);
 		slideInit();
 	}
@@ -152,21 +157,53 @@ public class MainActivity extends Activity implements
 	}
 
 	private void initControls() {
+		shareButton = (ImageView) findViewById(R.id.share);
+		shareButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+
+				if (shareLayVisib) {
+					((LinearLayout) findViewById(R.id.shareLay))
+							.setVisibility(View.INVISIBLE);
+					shareLayVisib = false;
+				} else {
+					((LinearLayout) findViewById(R.id.shareLay))
+							.setVisibility(View.VISIBLE);
+					shareLayVisib = true;
+				}
+
+			}
+		});
 		playButton = (ImageButton) findViewById(R.id.imageButton1);
 		playButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
-				try {
-					if (mediaPlayer.isPlaying()) {
-						mediaPlayer.stop();
-						mediaPlayer.reset();
+				mProgressDialog = new ProgressDialog(MainActivity.this);
+				mProgressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+				mProgressDialog.setMessage("Track loading...");
+				mProgressDialog.show();
+				new Thread((new Runnable() {
+					Message msg = null;
+
+					public void run() {
+						try {
+							if (mediaPlayer.isPlaying()) {
+								mediaPlayer.stop();
+								mediaPlayer.reset();
+							}
+							Log.i("ok", MainActivity.this.getHit().url);
+							play(new URL(MainActivity.this.getHit().url));
+							msg = mHandler.obtainMessage(1);
+							// sends the message to our handler
+							mHandler.sendMessage(msg);
+							mediaPlayer.start();
+						} catch (MalformedURLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
-					Log.i("ok",MainActivity.this.getHit().url);
-					play(new URL(MainActivity.this.getHit().url));
-					mediaPlayer.start();
-				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				})).start();
 			}
 		});
 
@@ -198,13 +235,20 @@ public class MainActivity extends Activity implements
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 				db.addHitToFavoris(MainActivity.this.hit);
-				Toast.makeText(MainActivity.this,
-						"add to fav" + db.getFavHits().size(),
-						Toast.LENGTH_SHORT).show();
-
+				favorisButton.setImageResource(R.drawable.etoilefav);
 			}
 		});
 	}
+
+	final Handler mHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case 1:
+				mProgressDialog.dismiss();
+				break;
+			}
+		}
+	};
 
 	protected void play(URL url) {
 		// TODO Auto-generated method stub
@@ -462,6 +506,12 @@ public class MainActivity extends Activity implements
 										.get(position));
 								((TextView) findViewById(R.id.hititle))
 										.setText(MainActivity.this.getHit().title);
+								if (db.isFav(MainActivity.this.hit))
+									favorisButton
+											.setImageResource(R.drawable.etoilefav);
+								else
+									favorisButton
+											.setImageResource(R.drawable.etoile);
 							}
 
 							@Override

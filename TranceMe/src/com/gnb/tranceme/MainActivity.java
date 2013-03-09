@@ -9,11 +9,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.R.bool;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -39,7 +39,6 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -62,6 +61,7 @@ import com.gnb.media.StreamingMediaPlayer;
 import com.gnb.model.Dj;
 import com.gnb.model.Hit;
 import com.gnb.receivers.ConnectionChangeReceiver;
+import com.gnb.social.ActivityShare;
 import com.gnb.sqlite.DatabaseHandler;
 
 public class MainActivity extends Activity implements
@@ -73,7 +73,7 @@ public class MainActivity extends Activity implements
 	public FrameLayout networkcanvas;
 	ConnectionChangeReceiver receiver;
 	private ImageButton playButton, pauseButton, stopButton;
-	ImageView favorisButton, shareButton;
+	ImageView favorisButton, shareButton,fbShare;
 	private boolean isPlaying;
 	private boolean encours = false;
 	private StreamingMediaPlayer audioStreamer;
@@ -157,6 +157,18 @@ public class MainActivity extends Activity implements
 	}
 
 	private void initControls() {
+		fbShare = (ImageView)findViewById(R.id.fbShare);
+		fbShare.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent i = new Intent(MainActivity.this, ActivityShare.class);
+				i.putExtra("titleTrack"	, MainActivity.this.getHit().title);
+				i.putExtra("urlImgTrack", MainActivity.this.getHit().img);
+				startActivity(i);
+			}
+		});
 		shareButton = (ImageView) findViewById(R.id.share);
 		shareButton.setOnClickListener(new OnClickListener() {
 

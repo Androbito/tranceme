@@ -74,8 +74,8 @@
 
             <LinearLayout
                 android:id="@+id/shareLay"
-                android:layout_width="70dp"
-                android:layout_height="50dp"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
                 android:layout_marginTop="2dp"
                 android:orientation="vertical"
@@ -83,16 +83,16 @@
 
                 <ImageView
                     android:id="@+id/imageView2"
-                    android:layout_width="70dp"
-                    android:layout_height="24dp"
-                    android:padding="1dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
                     android:background="@drawable/slider"
+                    android:padding="1dp"
                     android:src="@drawable/facebook_button" />
 
                 <ImageView
                     android:id="@+id/imageView3"
-                    android:layout_width="70dp"
-                    android:layout_height="24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
                     android:padding="1dp"
                     android:background="@drawable/slider"
                     android:src="@drawable/twitter_button" />

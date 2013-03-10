@@ -1,14 +1,17 @@
 package com.gnb.social;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.gnb.tranceme.MainActivity;
 import com.gnb.tranceme.R;
 
 public class ActivityShare extends Activity {
@@ -24,11 +27,13 @@ public class ActivityShare extends Activity {
 
 	final Runnable mUpdateFacebookNotification = new Runnable() {
 		public void run() {
+			mProgressDialog.dismiss();
 			finish();
-			Toast.makeText(getBaseContext(), "Facebook updated !",
-					Toast.LENGTH_LONG).show();
+			
 		}
 	};
+	
+	protected ProgressDialog mProgressDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,10 @@ public class ActivityShare extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				mProgressDialog = new ProgressDialog(ActivityShare.this);
+				mProgressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+				mProgressDialog.setMessage("Updating Your Facebook Status...");
+				mProgressDialog.show();
 				postMessage(editShare.getText().toString(), getIntent()
 						.getStringExtra("urlImgTrack"));
 			}

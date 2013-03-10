@@ -57,7 +57,6 @@ import com.gnb.coverflow.CoverAdapterView;
 import com.gnb.coverflow.CoverAdapterView.OnItemSelectedListener;
 import com.gnb.coverflow.CoverFlow;
 import com.gnb.coverflow.ImageAdapter;
-import com.gnb.media.StreamingMediaPlayer;
 import com.gnb.model.Dj;
 import com.gnb.model.Hit;
 import com.gnb.receivers.ConnectionChangeReceiver;
@@ -73,10 +72,7 @@ public class MainActivity extends Activity implements
 	public FrameLayout networkcanvas;
 	ConnectionChangeReceiver receiver;
 	private ImageButton playButton, pauseButton, stopButton;
-	ImageView favorisButton, shareButton,fbShare;
-	private boolean isPlaying;
-	private boolean encours = false;
-	private StreamingMediaPlayer audioStreamer;
+	ImageView favorisButton, shareButton, fbShare;
 	public SlideMenu slidemenu;
 	private ConnectivityManager manager;
 	private List<Dj> listdjs = new ArrayList<Dj>(0);
@@ -85,7 +81,6 @@ public class MainActivity extends Activity implements
 	private AlertDialog alert;
 	private CoverFlow coverFlow;
 	private Hit hit;
-	private boolean shareLayVisib = false;
 	private MediaPlayer mediaPlayer = new MediaPlayer();
 	DatabaseHandler db;
 	protected ProgressDialog mProgressDialog;
@@ -157,16 +152,18 @@ public class MainActivity extends Activity implements
 	}
 
 	private void initControls() {
-		fbShare = (ImageView)findViewById(R.id.fbShare);
+		fbShare = (ImageView) findViewById(R.id.fbShare);
 		fbShare.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Intent i = new Intent(MainActivity.this, ActivityShare.class);
-				i.putExtra("titleTrack"	, MainActivity.this.getHit().title);
+				i.putExtra("titleTrack", MainActivity.this.getHit().title);
 				i.putExtra("urlImgTrack", MainActivity.this.getHit().img);
+				((LinearLayout) findViewById(R.id.shareLay)).setVisibility(View.GONE);
 				startActivity(i);
+				
 			}
 		});
 		shareButton = (ImageView) findViewById(R.id.share);
@@ -176,14 +173,13 @@ public class MainActivity extends Activity implements
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 
-				if (shareLayVisib) {
+				if (((LinearLayout) findViewById(R.id.shareLay))
+						.getVisibility() == View.VISIBLE) {
 					((LinearLayout) findViewById(R.id.shareLay))
-							.setVisibility(View.INVISIBLE);
-					shareLayVisib = false;
+							.setVisibility(View.GONE);
 				} else {
 					((LinearLayout) findViewById(R.id.shareLay))
 							.setVisibility(View.VISIBLE);
-					shareLayVisib = true;
 				}
 
 			}

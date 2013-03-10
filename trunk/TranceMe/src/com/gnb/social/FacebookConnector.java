@@ -57,6 +57,7 @@ public class FacebookConnector {
 		    parameters.putString("name","TranceMe");
 		    parameters.putString("caption", "Download it for free on Play Store");
 		    parameters.putString("picture", Url);
+		    parameters.putString("link", "androbito.blogspot.com");
 		    try {
 				String response = facebook.request("me/feed", parameters,"POST");
 				System.out.println(response);

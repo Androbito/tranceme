@@ -10,7 +10,7 @@
         android:layout_height="wrap_content" >
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="50dp"
             android:background="@drawable/slider"
             android:orientation="vertical" >
@@ -82,7 +82,7 @@
                 android:visibility="gone" >
 
                 <ImageView
-                    android:id="@+id/imageView2"
+                    android:id="@+id/fbShare"
                     android:layout_width="wrap_content"
                     android:layout_height="35dp"
                     android:background="@drawable/slider"

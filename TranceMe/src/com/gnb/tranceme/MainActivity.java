@@ -80,7 +80,7 @@ public class MainActivity extends Activity implements
 	private List<Hit> hits, favHits;
 	private AlertDialog alert;
 	private CoverFlow coverFlow;
-	private Hit hit;
+	private Hit hit, currentHit;
 	private MediaPlayer mediaPlayer = new MediaPlayer();
 	DatabaseHandler db;
 	protected ProgressDialog mProgressDialog;
@@ -91,6 +91,14 @@ public class MainActivity extends Activity implements
 
 	public void setHit(Hit hit) {
 		this.hit = hit;
+	}
+
+	public Hit getCurrentHit() {
+		return currentHit;
+	}
+
+	public void setCurrentHit(Hit currentHit) {
+		this.currentHit = currentHit;
 	}
 
 	@Override
@@ -158,12 +166,23 @@ public class MainActivity extends Activity implements
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent i = new Intent(MainActivity.this, ActivityShare.class);
-				i.putExtra("titleTrack", MainActivity.this.getHit().title);
-				i.putExtra("urlImgTrack", MainActivity.this.getHit().img);
-				((LinearLayout) findViewById(R.id.shareLay)).setVisibility(View.GONE);
-				startActivity(i);
-				
+				if (MainActivity.this.getCurrentHit() != null) {
+					Intent i = new Intent(MainActivity.this,
+							ActivityShare.class);
+					i.putExtra("titleTrack",
+							MainActivity.this.getCurrentHit().title);
+					i.putExtra("urlImgTrack",
+							MainActivity.this.getCurrentHit().img);
+					((LinearLayout) findViewById(R.id.shareLay))
+							.setVisibility(View.GONE);
+					startActivity(i);
+				} else {
+					Toast.makeText(MainActivity.this, "Play a track please!",
+							Toast.LENGTH_LONG).show();
+					((LinearLayout) findViewById(R.id.shareLay))
+					.setVisibility(View.GONE);
+				}
+
 			}
 		});
 		shareButton = (ImageView) findViewById(R.id.share);
@@ -202,6 +221,8 @@ public class MainActivity extends Activity implements
 							}
 							Log.i("ok", MainActivity.this.getHit().url);
 							play(new URL(MainActivity.this.getHit().url));
+							MainActivity.this.setCurrentHit(MainActivity.this
+									.getHit());
 							msg = mHandler.obtainMessage(1);
 							// sends the message to our handler
 							mHandler.sendMessage(msg);
